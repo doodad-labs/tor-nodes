@@ -1,39 +1,61 @@
 # Tor Network Node Tracker
 
-[![Relay Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Frelay-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/relay-nodes.txt)
-[![Guard Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fguard-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/guard-nodes.txt)
-[![Exit Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fexit-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/exit-nodes.txt)
+[![Relay Nodes](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Frelay-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/relay-nodes.txt)
+[![Guard Nodes](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fguard-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/guard-nodes.txt)
+[![Exit Nodes](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fexit-nodes.json&style=flat-square)](https://github.com/doodad-labs/tor-nodes/blob/main/active/exit-nodes.txt)
 
-Automated hourly archive of active Tor network nodes (relay/exit/guard) with current and historical data.
+An automated hourly archive of active Tor network nodes with comprehensive historical tracking. This repository provides structured datasets of relay, exit, and guard nodes for research, monitoring, and analysis purposes.
 
-This repository provides automated tracking and archiving of Tor network nodes. The system collects data hourly, categorizing nodes into three groups: relay nodes (all active relays), exit nodes (relays that permit exiting traffic), and guard nodes (relays designated as entry guards).
+This system continuously monitors and archives Tor network infrastructure by collecting data directly from the Tor network every hour. The data is categorized into three distinct node types and preserved with complete historical records for longitudinal analysis.
 
-## Data Collection
+## Node Categories
 
-Data is sourced directly from the Tor network and updated every hour. Each update captures the current state of active nodes across all three categories. Historical data is preserved for reference and analysis.
+- **Relay Nodes**: All active relays operating within the Tor network, forming the core infrastructure for traffic routing.
+- **Exit Nodes**: Specialized relays configured to allow traffic to exit the Tor network and reach the public internet.
+- **Guard Nodes**: Entry points to the Tor network, selected as the first hop in circuit creation due to their stability and performance.
 
 ## Repository Structure
 
-- [`active/`](/active) - Contains the most recent node lists, updated hourly. Files include JSON and plain text formats for each node category.
-- `history/YYYY-MM-DD/` - Historical archives organized by date, preserving daily snapshots of node activity.
+```
+├── active/                     # Current node lists (hourly updates)
+│   ├── relay-nodes.json        # All active relays (JSON)
+│   ├── relay-nodes.txt         # All active relays (Plain text)
+│   ├── exit-nodes.json         # Exit-capable relays (JSON)
+│   ├── exit-nodes.txt          # Exit-capable relays (Plain text)
+│   ├── guard-nodes.json        # Guard-capable relays (JSON)
+│   └── guard-nodes.txt         # Guard-capable relays (Plain text)
+│
+└── history/                    # Historical archives
+     └── YYYY-MM-DD/            # Daily snapshots
+         ├── relay-nodes.json   # All active relays (JSON)
+         ├── relay-nodes.txt    # All active relays (Plain text)
+         ├── exit-nodes.json    # Exit-capable relays (JSON)
+         ├── exit-nodes.txt     # Exit-capable relays (Plain text)
+         ├── guard-nodes.json   # Guard-capable relays (JSON)
+         └── guard-nodes.txt    # Guard-capable relays (Plain text)
+```
 
-## Update Schedule
+## Data Specifications
 
-Updates occur automatically every hour. The system maintains both current active node lists and historical archives without manual intervention.
+- **Update Frequency:** Hourly synchronization  
+- **Data Source:** Direct Tor network queries  
+- **Formats Available:**
+  - **JSON** – Structured data for programmatic access and analysis
+  - **Plain Text** – Human-readable format for quick reference and simple parsing
+- **Retention:** Complete historical records with daily organization
 
-## Data Formats
+## Ethical Consideration
 
-Two formats are provided for each node category and timestamp:
-- JSON format for programmatic access and structured data processing
-- Plain text format for human readability and simple parsing
+**Bridge nodes will never be tracked or published.** We recognize that publishing bridge node information would directly harm users in censored regions who rely on these resources for safe access to the Tor network. This repository is intentionally limited to publicly discoverable relay infrastructure only.
 
 ## Usage
 
-This data can be used for network analysis, security research, Tor network monitoring, or as a reference dataset for academic studies. The historical archives enable tracking of node availability and network changes over time.
+The data is suitable for:
+- Network research and analysis
+- Security monitoring and threat intelligence
+- Academic studies of decentralized networks
+- Infrastructure monitoring and visualization projects
 
-## Categories
+## Automation
 
-Three node categories are tracked:
-- Relay nodes: All active relays in the Tor network
-- Exit nodes: Relays configured to allow traffic to exit the Tor network
-- Guard nodes: Relays suitable for use as entry points to the Tor network (Entry nodes)
+All data collection, processing, and archiving is fully automated through scheduled workflows, ensuring consistent updates without manual intervention.
