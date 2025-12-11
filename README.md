@@ -1,5 +1,9 @@
 # Tor Network Node Tracker
 
+![Relay Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Frelay-nodes.json&style=flat-square)
+![Guard Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fguard-nodes.json&style=flat-square)
+![Exit Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdoodad-labs%2Ftor-nodes%2Frefs%2Fheads%2Fmain%2Finfo%2Fexit-nodes.json&style=flat-square)
+
 Automated hourly archive of active Tor network nodes (relay/exit/guard) with current and historical data.
 
 This repository provides automated tracking and archiving of Tor network nodes. The system collects data hourly, categorizing nodes into three groups: relay nodes (all active relays), exit nodes (relays that permit exiting traffic), and guard nodes (relays designated as entry guards).
