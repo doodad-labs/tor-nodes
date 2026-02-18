@@ -54,11 +54,14 @@ jobs:
       - name: Generate node distribution pie chart
         run: python3 scripts/node_distribution_pie.py
 
-      - name: Generate combined analytics chart
-        run: python3 scripts/combined_chart.py
+      - name: Generate churn rate chart
+        run: python3 scripts/churn_rate.py
 
       - name: Generate geolocation map
         run: python3 scripts/geolocation_map.py
+
+      - name: Generate combined analytics chart
+        run: python3 scripts/combined_chart.py
 
       - name: Commit and push changes
         run: |
@@ -67,7 +70,7 @@ jobs:
           
           # Check if there are changes (including untracked files)
           if git status --porcelain | grep -q stats/.*\.png; then
-            git add stats/network-chart.png stats/node-distribution-pie.png stats/combined-analytics.png stats/geolocation-map.png
+            git add stats/network-chart.png stats/node-distribution-pie.png stats/churn-rate.png stats/combined-analytics.png stats/geolocation-map.png
             git commit -m "chore: update analytics charts [automated]"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
           else
@@ -80,5 +83,6 @@ jobs:
           echo "Analytics generation completed"
           echo "Network chart: stats/network-chart.png"
           echo "Node distribution chart: stats/node-distribution-pie.png"
+          echo "Churn rate chart: stats/churn-rate.png"
           echo "Combined chart: stats/combined-analytics.png"
           echo "Geolocation map: stats/geolocation-map.png"
