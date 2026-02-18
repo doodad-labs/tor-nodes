@@ -36,10 +36,6 @@ env/
 *~
 .DS_Store
 
-# Generated charts/images
-stats/network-chart.png
-stats/node-distribution-pie.png
-
 # Temporary files
 tmp.ts
 *.tmp
