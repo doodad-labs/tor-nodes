@@ -3,7 +3,7 @@ name: Generate Analytics Charts
 on:
   schedule:
     # Run at 1am UTC daily
-    - cron: '0 1 * * *'
+    - cron: '0 10 * * *'
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
