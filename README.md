@@ -53,6 +53,12 @@ This system continuously monitors and archives Tor network infrastructure by col
   - **Comma-separated values** – Analytical format for quick parsing
 - **Retention:** Complete historical records with daily organization
 
+## Analytics
+
+![stats/combined-analytics.png](stats/combined-analytics.png)
+
+<sub> Updated daily. The chart on the left illustrates the growth of the Tor network over time, displayed by day and labelled by month. The pie chart on the right shows the current active distribution of Tor nodes by type: exit, relay, and guard. </sub>
+
 ## Ethical Consideration
 
 **Bridge nodes will never be tracked or published.** We recognize that publishing bridge node information would directly harm users in censored regions who rely on these resources for safe access to the Tor network. This repository is intentionally limited to publicly discoverable relay infrastructure only.
