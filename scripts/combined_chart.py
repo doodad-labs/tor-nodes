@@ -8,66 +8,87 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 STATS_DIR = PROJECT_ROOT / "stats"
 
-LEFT_IMAGE = STATS_DIR / "network-chart.png"
-RIGHT_IMAGE = STATS_DIR / "node-distribution-pie.png"
+TOP_LEFT_IMAGE = STATS_DIR / "network-chart.png"
+TOP_RIGHT_IMAGE = STATS_DIR / "node-distribution-pie.png"
+BOTTOM_IMAGE = STATS_DIR / "geolocation-map.png"
 OUTPUT_FILE = STATS_DIR / "combined-analytics.png"
 
-GAP = 10  # pixels
+HORIZONTAL_GAP = 10  # pixels between left and right charts
+VERTICAL_GAP = 20    # pixels between top row and bottom chart
 BACKGROUND_COLOR = (255, 255, 255)  # white
 
 def combine_charts():
-    """Combine two chart images side-by-side with white background."""
+    """Combine three chart images: two on top (side-by-side), one full-width on bottom."""
     
-    # Check if both images exist
-    if not LEFT_IMAGE.exists():
-        print(f"Error: Left image not found: {LEFT_IMAGE}")
+    # Check if all images exist
+    if not TOP_LEFT_IMAGE.exists():
+        print(f"Error: Top left image not found: {TOP_LEFT_IMAGE}")
         return False
     
-    if not RIGHT_IMAGE.exists():
-        print(f"Error: Right image not found: {RIGHT_IMAGE}")
+    if not TOP_RIGHT_IMAGE.exists():
+        print(f"Error: Top right image not found: {TOP_RIGHT_IMAGE}")
+        return False
+    
+    if not BOTTOM_IMAGE.exists():
+        print(f"Error: Bottom image not found: {BOTTOM_IMAGE}")
         return False
     
     print("Loading images...")
-    left_img = Image.open(LEFT_IMAGE)
-    right_img = Image.open(RIGHT_IMAGE)
+    top_left_img = Image.open(TOP_LEFT_IMAGE)
+    top_right_img = Image.open(TOP_RIGHT_IMAGE)
+    bottom_img = Image.open(BOTTOM_IMAGE)
     
-    print(f"  Left image (network chart): {left_img.size}")
-    print(f"  Right image (pie chart): {right_img.size}")
+    print(f"  Top left image (network chart): {top_left_img.size}")
+    print(f"  Top right image (pie chart): {top_right_img.size}")
+    print(f"  Bottom image (geolocation map): {bottom_img.size}")
     
     # Get dimensions
-    left_width, left_height = left_img.size
-    right_width, right_height = right_img.size
+    left_width, left_height = top_left_img.size
+    right_width, right_height = top_right_img.size
+    bottom_width, bottom_height = bottom_img.size
     
-    # Use max height as target (so both images fit without cropping)
-    target_height = max(left_height, right_height)
+    # Use max height of top charts as target for top row
+    top_target_height = max(left_height, right_height)
     
-    # Scale images to target height while maintaining aspect ratio
-    left_scale = target_height / left_height
+    # Scale top images to target height while maintaining aspect ratio
+    left_scale = top_target_height / left_height
     new_left_width = int(left_width * left_scale)
-    left_resized = left_img.resize((new_left_width, target_height), Image.Resampling.LANCZOS)
+    top_left_resized = top_left_img.resize((new_left_width, top_target_height), Image.Resampling.LANCZOS)
     
-    right_scale = target_height / right_height
+    right_scale = top_target_height / right_height
     new_right_width = int(right_width * right_scale)
-    right_resized = right_img.resize((new_right_width, target_height), Image.Resampling.LANCZOS)
+    top_right_resized = top_right_img.resize((new_right_width, top_target_height), Image.Resampling.LANCZOS)
+    
+    # Calculate top row width
+    top_row_width = new_left_width + HORIZONTAL_GAP + new_right_width
+    
+    # Scale bottom image to match top row width while maintaining aspect ratio
+    bottom_scale = top_row_width / bottom_width
+    new_bottom_height = int(bottom_height * bottom_scale)
+    bottom_resized = bottom_img.resize((top_row_width, new_bottom_height), Image.Resampling.LANCZOS)
     
     print(f"\nResized images:")
-    print(f"  Left: {left_resized.size}")
-    print(f"  Right: {right_resized.size}")
+    print(f"  Top left: {top_left_resized.size}")
+    print(f"  Top right: {top_right_resized.size}")
+    print(f"  Bottom: {bottom_resized.size}")
     
-    # Calculate combined dimensions
-    combined_width = new_left_width + GAP + new_right_width
-    combined_height = target_height
+    # Calculate final combined dimensions
+    combined_width = top_row_width
+    combined_height = top_target_height + VERTICAL_GAP + new_bottom_height
     
     print(f"\nCombined dimensions: {combined_width}x{combined_height}")
     
     # Create new image with white background
     combined_img = Image.new("RGB", (combined_width, combined_height), BACKGROUND_COLOR)
     
-    # Paste left image
-    combined_img.paste(left_resized, (0, 0))
+    # Paste top left image
+    combined_img.paste(top_left_resized, (0, 0))
     
-    # Paste right image with gap
-    combined_img.paste(right_resized, (new_left_width + GAP, 0))
+    # Paste top right image with horizontal gap
+    combined_img.paste(top_right_resized, (new_left_width + HORIZONTAL_GAP, 0))
+    
+    # Paste bottom image with vertical gap
+    combined_img.paste(bottom_resized, (0, top_target_height + VERTICAL_GAP))
     
     # Save combined image
     combined_img.save(OUTPUT_FILE, "PNG")
