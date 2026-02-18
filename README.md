@@ -57,7 +57,7 @@ This system continuously monitors and archives Tor network infrastructure by col
 
 ![stats/combined-analytics.png](stats/combined-analytics.png)
 
-<sub> Updated daily. The chart on the left illustrates the growth of the Tor network over time, displayed by day and labelled by month. The pie chart on the right shows the current active distribution of Tor nodes by type: exit, relay, and guard. </sub>
+<sub> Updated daily. The chart on the left illustrates the growth of the Tor network over time, displayed by day and labelled by month. The pie chart on the right shows the current distribution of active Tor nodes by type: exit, relay, and guard. The world map visualises the geographical distribution of active relays, with bubble sizes representing the relative number of relays in each location. </sub>
 
 ## Ethical Consideration
 
