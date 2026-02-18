@@ -87,11 +87,15 @@ else:
     y = []
     z = []
 
-# Plot scatter points (with larger sizes for better visibility)
+# Plot scatter points (with capped sizes for better visibility)
 if len(x) > 0:
+    # Cap bubble sizes - max size of 300 for largest countries
+    bubble_sizes = z * 1.5
+    bubble_sizes = bubble_sizes.clip(max=300)
+    
     scatter = plt.scatter(
         x, y,
-        s=z * 2,            # Size proportional to number of nodes (multiplied by 2 for visibility)
+        s=bubble_sizes,      # Size capped at 300 for visibility
         c=z,                # Color by node count
         alpha=0.7,
         cmap='autumn',
