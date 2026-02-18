@@ -11,6 +11,7 @@ import geopandas as gpd
 import pandas as pd
 import os
 import urllib.request
+from datetime import datetime
 
 # Load geolocation data
 with open("active/geo-location.json", "r") as f:
@@ -98,6 +99,11 @@ ax.spines['top'].set_visible(False)
 ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
+
+# Add generated date text in bottom right (before tight_layout)
+generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
+fig.text(0.98, 0.02, generated_text, fontsize=9, ha='right', va='bottom',
+         color='gray', alpha=0.7)
 
 # Tight layout
 plt.tight_layout()

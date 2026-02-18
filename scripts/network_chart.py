@@ -105,6 +105,12 @@ def generate_chart(data):
     # Tight layout to prevent label cutoff
     plt.tight_layout()
     
+    # Add generated date text in bottom right of image (outside chart area)
+    fig = plt.gcf()
+    generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
+    fig.text(0.98, 0.02, generated_text, fontsize=9, ha='right', va='bottom',
+             color='gray', alpha=0.7)
+    
     # Save chart
     plt.savefig(OUTPUT_FILE, dpi=300, bbox_inches="tight")
     print(f"\n✓ Chart saved: {OUTPUT_FILE}")

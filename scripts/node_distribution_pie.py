@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 # Configuration
@@ -81,6 +82,12 @@ def generate_pie_chart():
     
     # Tight layout to prevent label cutoff
     plt.tight_layout()
+    
+    # Add generated date text in bottom right
+    fig = plt.gcf()
+    generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
+    fig.text(0.99, 0.01, generated_text, fontsize=9, ha='right', va='bottom',
+             color='gray', alpha=0.7)
     
     # Save chart
     plt.savefig(OUTPUT_FILE, dpi=300, bbox_inches="tight")

@@ -206,6 +206,11 @@ def generate_churn_chart(data):
     fig.text(0.12, 0.02, stats_text, fontsize=10, family='monospace',
              bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
     
+    # Add generated date text in bottom right
+    generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
+    fig.text(0.99, 0.01, generated_text, fontsize=9, ha='right', va='bottom',
+             color='gray', alpha=0.7)
+    
     plt.tight_layout(rect=[0, 0.06, 1, 1])
     plt.savefig(OUTPUT_FILE, dpi=150, bbox_inches="tight")
     print(f"\n✓ Churn rate chart saved: {OUTPUT_FILE}")
