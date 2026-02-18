@@ -110,15 +110,19 @@ if len(x) > 0:
 else:
     print("No country data to plot")
 
-# Set axis limits and labels
+# Set axis limits
 plt.xlim([-180, 180])
 plt.ylim([-60, 85])  # Exclude Antarctica
-plt.xlabel("Longitude", fontsize=12)
-plt.ylabel("Latitude", fontsize=12)
-plt.title("Tor Network Node Distribution by Country\nBubble size and color represent node count per country", fontsize=14, fontweight='bold')
 
-# Add grid
-ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
+# Remove axis labels, title, grid, and spines for clean map
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_xticklabels([])
+ax.set_yticklabels([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
 
 # Tight layout
 plt.tight_layout()
