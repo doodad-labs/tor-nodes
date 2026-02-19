@@ -30,26 +30,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib Pillow scipy geopandas pandas
 
-      - name: Download Natural Earth data
-        run: |
-          python3 << 'EOF'
-          import geopandas as gpd
-          import os
-          import urllib.request
-          
-          cache_dir = os.path.expanduser("~/.cache/geopandas")
-          os.makedirs(cache_dir, exist_ok=True)
-          
-          zip_path = os.path.join(cache_dir, "naturalearth_lowres.zip")
-          if not os.path.exists(zip_path):
-              print("Downloading Natural Earth data...")
-              url = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
-              urllib.request.urlretrieve(url, zip_path)
-              print("✓ Natural Earth data downloaded")
-          else:
-              print("✓ Natural Earth data already cached")
-          EOF
-
       - name: Generate network chart
         run: python3 scripts/network_chart.py
 
@@ -66,21 +46,12 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "github-actions[bot]"
-          
-          # Check if there are changes (including untracked files)
-          if git status --porcelain | grep -q stats/.*\.png; then
-            git add stats/network-chart.png stats/node-distribution-pie.png stats/churn-rate.png stats/geolocation-map.png
+
+          # Check if any PNG files in stats/ have changed (including new files)
+          if git status --porcelain | grep -E '^(\?\?| M|M ) stats/.*\.png$'; then
+            git add stats/*.png
             git commit -m "chore: update analytics charts [automated]"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
           else
-            echo "No changes to commit"
+            echo "No PNG changes to commit"
           fi
-
-      - name: Check workflow status
-        if: always()
-        run: |
-          echo "Analytics generation completed"
-          echo "Network chart: stats/network-chart.png"
-          echo "Node distribution chart: stats/node-distribution-pie.png"
-          echo "Churn rate chart: stats/churn-rate.png"
-          echo "Geolocation map: stats/geolocation-map.png"
