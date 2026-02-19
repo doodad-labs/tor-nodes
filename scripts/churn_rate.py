@@ -19,6 +19,7 @@ SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 HISTORY_DIR = PROJECT_ROOT / "history"
 OUTPUT_FILE = PROJECT_ROOT / "stats" / "churn-rate.png"
+HISTORY_OUTPUT_FILE = HISTORY_DIR / f"{YEAR}" / f"{MONTH:02d}" / f"{YEAR}-{MONTH:02d}-{DAY:02d}" / "churn-rate.png"
 
 def collect_churn_data():
     """Collect node appearance/disappearance data and calculate lifespans."""
@@ -207,7 +208,8 @@ def generate_churn_chart(data):
     
     plt.tight_layout(rect=[0, 0.06, 1, 1])
     plt.savefig(OUTPUT_FILE, dpi=150, bbox_inches="tight")
-    print(f"\n✓ Churn rate chart saved: {OUTPUT_FILE}")
+    plt.savefig(HISTORY_OUTPUT_FILE, dpi=150, bbox_inches="tight")
+    print(f"\n✓ Churn rate chart saved: {OUTPUT_FILE}, {HISTORY_OUTPUT_FILE}")
     plt.close()
 
 if __name__ == "__main__":

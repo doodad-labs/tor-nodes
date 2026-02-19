@@ -6,80 +6,91 @@ Aggregates nodes by country and places them at country centroids.
 """
 
 import json
+from pathlib import Path
 import matplotlib.pyplot as plt
 import geopandas as gpd
 import pandas as pd
-import os
 import urllib.request
 from datetime import datetime
 
-def generate_map():
+YEAR = datetime.now().year
+MONTH = datetime.now().month
+DAY = datetime.now().day
+
+# Configuration
+SCRIPT_DIR = Path(__file__).parent
+PROJECT_ROOT = SCRIPT_DIR.parent
+WORLD_FILE = PROJECT_ROOT / "ne_110m_admin_0_countries.zip"
+ACTIVE_DIR = PROJECT_ROOT / "active"
+HISTORY_DIR = PROJECT_ROOT / "history"
+OUTPUT_FILE = PROJECT_ROOT / "stats" / "geolocation-map.png"
+HISTORY_OUTPUT_FILE = HISTORY_DIR / f"{YEAR}" / f"{MONTH:02d}" / f"{YEAR}-{MONTH:02d}-{DAY:02d}" / "geolocation-map.png"
+WORLD_MAP = None
+
+def download_natural_earth_data() -> Path:
+    """Download Natural Earth data if not already cached. Returns path to zip."""
+    if not WORLD_FILE.exists():
+        print("Downloading Natural Earth data...")
+        url = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
+        urllib.request.urlretrieve(url, WORLD_FILE)
+    return WORLD_FILE
+
+
+def load_world_map() -> gpd.GeoDataFrame:
+    """
+    Load Natural Earth countries from the zip.
+    Fiona/GDAL understands zip:// URIs.
+    """
+    zip_path = download_natural_earth_data()
+
+    # Often geopandas can infer the layer directly from the zip:
+    try:
+        return gpd.read_file(f"zip://{zip_path}")
+    except Exception:
+        # If inference fails, explicitly point to the .shp inside the zip:
+        # (This filename matches the Natural Earth download you’re using.)
+        shp_in_zip = "ne_110m_admin_0_countries.shp"
+        return gpd.read_file(f"zip://{zip_path}!{shp_in_zip}")
+
+def generate_map(world_map: gpd.GeoDataFrame | None):
     # Load geolocation data
-    with open("active/geo-location.json", "r") as f:
+    with open(ACTIVE_DIR / "geo-location.json", "r") as f:
         geo_data = json.load(f)
 
-    # Convert to DataFrame
     df = pd.DataFrame(geo_data)
 
-    # Get world map from Natural Earth dataset
-    try:
-        cache_dir = os.path.expanduser("~/.cache/geopandas")
-        zip_path = os.path.join(cache_dir, "naturalearth_lowres.zip")
-        
-        if os.path.exists(zip_path):
-            worldmap = gpd.read_file(f"zip://{zip_path}!ne_110m_admin_0_countries.shp")
-        else:
-            # Fallback: download on demand
-            os.makedirs(cache_dir, exist_ok=True)
-            print("Downloading Natural Earth data...")
-            url = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
-            urllib.request.urlretrieve(url, zip_path)
-            worldmap = gpd.read_file(f"zip://{zip_path}!ne_110m_admin_0_countries.shp")
-    except Exception as e:
-        print(f"Warning: Could not load Natural Earth data: {e}")
-        print("Continuing with map outline only...")
-        worldmap = None
+    # Filter out Antarctica / extreme south
+    if world_map is not None and not world_map.empty:
+        world_map = world_map[~world_map["NAME"].str.contains("Antarctica", case=False, na=False)]
+        # bounds is a DataFrame with columns: minx, miny, maxx, maxy
+        world_map = world_map[world_map.bounds["miny"] > -85]
 
-    # Remove Antarctica if present
-    if worldmap is not None:
-        # Filter out Antarctica and other polar regions
-        worldmap = worldmap[~worldmap['NAME'].str.contains('Antarctica', case=False, na=False)]
-        # Also filter by latitude to remove extreme southern regions
-        worldmap = worldmap[worldmap.geometry.bounds['miny'] > -85]
-
-    # Create figure
     fig, ax = plt.subplots(figsize=(16, 10))
 
-    # Plot world map
-    if worldmap is not None:
-        worldmap.plot(color="lightgrey", ax=ax, edgecolor="white", linewidth=0.5)
+    if world_map is not None and not world_map.empty:
+        world_map.plot(color="lightgrey", ax=ax, edgecolor="white", linewidth=0.5)
     else:
         ax.set_facecolor("#e6f2ff")
 
-    # Aggregate nodes by location (aggregate nearby points)
-    node_counts = df.groupby(['latitude', 'longitude']).size().reset_index(name='node_count')
+    node_counts = df.groupby(["latitude", "longitude"]).size().reset_index(name="node_count")
 
     print(f"Found {len(node_counts)} unique lat/lon locations with Tor nodes")
-    print(f"Total nodes: {node_counts['node_count'].sum()}")
+    print(f"Total nodes: {int(node_counts['node_count'].sum())}")
 
-    # Extract coordinates
-    x = node_counts['longitude'].values
-    y = node_counts['latitude'].values
-    z = node_counts['node_count'].values
+    if not node_counts.empty:
+        x = node_counts["longitude"].values
+        y = node_counts["latitude"].values
+        z = node_counts["node_count"].values
 
-    # Plot scatter points (with capped sizes for better visibility)
-    if len(x) > 0:
-        # Scale and cap bubble sizes - min 10, max 50 for better visibility with many points
-        bubble_sizes = z * 0.5
-        bubble_sizes = bubble_sizes.clip(min=10, max=50)
-        
-        scatter = plt.scatter(
+        bubble_sizes = (z * 0.5).clip(min=10, max=50)
+
+        ax.scatter(
             x, y,
-            s=bubble_sizes,      # Size between 10 and 50 for visibility
-            c=z,                # Color by node count
+            s=bubble_sizes,
+            c=z,
             alpha=0.6,
-            cmap='autumn',
-            edgecolors='darkred',
+            cmap="autumn",
+            edgecolors="darkred",
             linewidth=0.5,
             vmin=0,
             vmax=z.max()
@@ -87,34 +98,38 @@ def generate_map():
     else:
         print("No location data to plot")
 
-    # Set axis limits
-    plt.xlim([-180, 180])
-    plt.ylim([-60, 85])  # Exclude Antarctica
+    ax.set_xlim([-180, 180])
+    ax.set_ylim([-60, 85])  # Exclude Antarctica
 
-    # Remove axis labels, title, grid, and spines for clean map
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_xticklabels([])
-    ax.set_yticklabels([])
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['left'].set_visible(False)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
 
-    # Add generated date text in bottom right (before tight_layout)
     generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
-    fig.text(0.98, 0.02, generated_text, fontsize=9, ha='right', va='bottom',
-            color='gray', alpha=0.7)
+    fig.text(0.98, 0.02, generated_text, fontsize=9, ha="right", va="bottom",
+            color="gray", alpha=0.7)
 
-    # Tight layout
     plt.tight_layout()
 
-    # Save figure
-    plt.savefig("stats/geolocation-map.png", dpi=150, bbox_inches='tight')
-    print("✓ Geolocation map saved to stats/geolocation-map.png")
+    # Ensure output directories exist
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    HISTORY_OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-    plt.close()
+    plt.savefig(OUTPUT_FILE, dpi=150, bbox_inches="tight")
+    plt.savefig(HISTORY_OUTPUT_FILE, dpi=150, bbox_inches="tight")
+    print(f"✓ Geolocation map saved to {OUTPUT_FILE}, {HISTORY_OUTPUT_FILE}")
+
+    plt.close(fig)
 
 if __name__ == "__main__":
+    print(WORLD_FILE)
+
+    try:
+        WORLD_MAP = load_world_map()
+    except Exception as e:
+        print(f"Error loading world map data: {e}")
+        WORLD_MAP = None
+
     print("Generating geolocation map...")
-    generate_map()
+    generate_map(WORLD_MAP)

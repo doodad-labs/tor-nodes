@@ -6,11 +6,17 @@ import matplotlib.pyplot as plt
 from utils.constants import COLOURS
 from utils.utils import count_nodes_in_file
 
+YEAR = datetime.now().year
+MONTH = datetime.now().month
+DAY = datetime.now().day
+
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 ACTIVE_DIR = PROJECT_ROOT / "active"
 OUTPUT_FILE = PROJECT_ROOT / "stats" / "node-distribution-pie.png"
+HISTORY_DIR = PROJECT_ROOT / "history"
+HISTORY_OUTPUT_FILE = HISTORY_DIR / f"{YEAR}" / f"{MONTH:02d}" / f"{YEAR}-{MONTH:02d}-{DAY:02d}" / "node-distribution-pie.png"
 
 def generate_pie_chart():
     """Generate and save the pie chart."""
@@ -73,10 +79,11 @@ def generate_pie_chart():
     fig = plt.gcf()
     generated_text = f"generated: {datetime.now().strftime('%Y-%m-%d')}"
     fig.text(0.99, 0.01, generated_text, fontsize=9, ha='right', va='bottom',
-             color='gray', alpha=0.7)
+            color='gray', alpha=0.7)
     
     # Save chart
     plt.savefig(OUTPUT_FILE, dpi=300, bbox_inches="tight")
+    plt.savefig(HISTORY_OUTPUT_FILE, dpi=300, bbox_inches="tight")
     print(f"✓ Pie chart saved: {OUTPUT_FILE}")
     plt.close()
 
