@@ -45,11 +45,13 @@ jobs:
       - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "github-actions[bot]"
+          git config --local user.name "Analytics Bot"
 
-          # Check if any PNG files in stats/ have changed (including new files)
-          if git status --porcelain | grep -E '^(\?\?| M|M ) stats/.*\.png$'; then
-            git add stats/*.png
+          # Stage all PNG files in the entire repo
+          git add '*.png'
+
+          # Only commit if something actually changed
+          if ! git diff --cached --quiet; then
             git commit -m "chore: update analytics charts [automated]"
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:${{ github.ref }}
           else
