@@ -8,26 +8,14 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+from utils.constants import COLOURS
+from utils.utils import count_nodes_in_file
+
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 HISTORY_DIR = PROJECT_ROOT / "history"
 OUTPUT_FILE = PROJECT_ROOT / "stats" / "network-chart.png"
-
-COLOURS = {
-    "relay": (189/255, 97/255, 87/255, 1),  # red
-    "exit": (86/255, 189/255, 164/255, 1),   # green
-    "guard": (87/255, 148/255, 189/255, 1),  # blue
-    "all": (116/255, 87/255, 189/255, 1),  # purple
-}
-
-def count_nodes_in_file(filepath):
-    """Count the number of lines (nodes) in a text file."""
-    try:
-        with open(filepath, 'r') as f:
-            return len(f.readlines())
-    except FileNotFoundError:
-        return 0
 
 def collect_data():
     """Collect node counts for each day from history directory."""

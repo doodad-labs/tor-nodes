@@ -4,27 +4,21 @@ Generate churn rate analytics for Tor nodes.
 Tracks node appearance, disappearance, and average node lifetime.
 """
 
-import os
 from pathlib import Path
 from datetime import datetime
-from collections import defaultdict
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import numpy as np
+from utils.constants import COLOURS
+
+YEAR = datetime.now().year
+MONTH = datetime.now().month
+DAY = datetime.now().day
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 HISTORY_DIR = PROJECT_ROOT / "history"
 OUTPUT_FILE = PROJECT_ROOT / "stats" / "churn-rate.png"
-
-# Color scheme from network chart
-COLOURS = {
-    "relay": (189/255, 97/255, 87/255, 1),  # red
-    "exit": (86/255, 189/255, 164/255, 1),   # green
-    "guard": (87/255, 148/255, 189/255, 1),  # blue
-    "churn": (87/255, 148/255, 189/255, 1),  # blue for churn rate
-}
 
 def collect_churn_data():
     """Collect node appearance/disappearance data and calculate lifespans."""
